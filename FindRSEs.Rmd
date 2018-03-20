@@ -55,9 +55,19 @@ followsfollows <- rse_follows_data %>%
    filter(rownum <= 15) 
 
 friends <- get_friends(followsfollows$user_id, retryonratelimit = TRUE)
+save(friends, file="friends.RData")
+```
 
-friends %>% group_by(user) %>% 
-  summarise(numincommon = sum(user_id %in% rse_follows_data$user_id))
-  
+We can sort by the number of friends these have in common with the RSE account:
+
+```{r}
+common_counts <- friends %>% group_by(user) %>% 
+  summarise(numincommon = sum(user_id %in% rse_follows_data$user_id)) %>% 
+  arrange(desc(numincommon)) 
+friends_info<-lookup_users(common_counts$user)  
+
+friends_data <- friends_info %>% full_join(common_counts, by=c("user_id" = "user")) %>% 
+  arrange(desc(numincommon)) %>% select(numincommon, screen_name, name)
+friends_data
 ```
 
