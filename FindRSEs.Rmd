@@ -1,0 +1,63 @@
+---
+title: "Finding RSEs and Data scientists"
+output: html_notebook
+---
+
+This notebook uses tweetR to find RSEs (and RSE-like people) using twitter data.
+
+```{r setup}
+
+library(rtweet)
+library(tidyverse)
+library(wordcloud)
+
+account <- "ResearchSoftEng"
+maxFriends <- 250
+```
+
+
+
+
+We use the `r account` account as a seed; this is the official Twitter account of the RSE association.  We assume that everyone following this is an RSE.
+
+```{r}
+
+rse_follows <- get_followers(account)
+rse_follows_data <- lookup_users(rse_follows$user_id)
+```
+
+There are two approaches we can use:
+
+1. Look at how RSEs describe themselves, and look for similar terms in other users' descriptions
+2. Look at accounts that RSEs follow, and then look for other accounts that also follow these accounts
+
+Looking at the description data:
+```{r}
+descriptionMinusCommon <- str_replace(tolower(rse_follows_data$description), "research", "")
+suppressWarnings(wordcloud(descriptionMinusCommon))
+```
+
+
+
+
+Looking at the second approach:   In order to avoid getting excessively hit by the Twitter API's rate limit, we'll *only* look at people following fewer than `r maxFriends`.  This isn't ideal, and will likely bias our results:
+
+```{r}
+rse_follows_data <- lookup_users(rse_follows$user_id)
+
+summary(rse_follows_data$friends_count)
+```
+
+```{r}
+followsfollows <- rse_follows_data %>% 
+  filter(friends_count <= maxFriends) # %>% 
+   mutate(rownum = row_number()) %>% 
+   filter(rownum <= 15) 
+
+friends <- get_friends(followsfollows$user_id, retryonratelimit = TRUE)
+
+friends %>% group_by(user) %>% 
+  summarise(numincommon = sum(user_id %in% rse_follows_data$user_id))
+  
+```
+
