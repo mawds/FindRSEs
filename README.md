@@ -16,7 +16,7 @@ Plos Articles author contribution attribution.
 
 ## Architecture
 
-![architecture diagram](https://github.com/mawds/FindRSEs/blob/master/IMG_20180320_163710.jpg "architecture diagram")
+![architecture diagram](https://github.com/mawds/FindRSEs/blob/master/IMG_20180320_163710.jpg)
 
 ## Analyses
 
