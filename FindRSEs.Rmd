@@ -24,6 +24,7 @@ We use the `r account` account as a seed; this is the official Twitter account o
 
 rse_follows <- get_followers(account)
 rse_follows_data <- lookup_users(rse_follows$user_id)
+save(rse_follows_data, file="RSEFollows.RData")
 ```
 
 There are two approaches we can use:
@@ -50,7 +51,6 @@ summary(rse_follows_data$friends_count)
 
 ```{r}
 followsfollows <- rse_follows_data %>% 
-  filter(friends_count <= maxFriends) # %>% 
    mutate(rownum = row_number()) %>% 
    filter(rownum <= 15) 
 
