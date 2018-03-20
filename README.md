@@ -14,8 +14,10 @@ We explore diverse data sources:
 
 Plos Articles author contribution attribution.
 
+## Architecture
+
+![architecture diagram](https://github.com/mawds/FindRSEs/blob/master/IMG_20180320_163710.jpg "architecture diagram")
 
 ## Analyses
 
-* [Relative term frequency in twitter and RSE job adverts](RSEDescriptionAnalysis.nb.html)
-* [Find users in github](find-github-users.ipynb)
+[Relative term frequency in twitter and RSE job adverts](RSEDescriptionAnalysis.nb.html)
