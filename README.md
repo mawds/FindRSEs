@@ -13,3 +13,8 @@ We explore diverse data sources:
 [University of Cambridge Website](www.cam.ac.uk)
 
 Plos Articles author contribution attribution.
+
+
+## Analyses
+
+[Relative term frequency in twitter and RSE job adverts](FindRSEs/RSEDescriptionAnalysis.nb.html)
