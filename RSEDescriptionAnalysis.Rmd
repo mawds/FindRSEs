@@ -1,0 +1,128 @@
+---
+title: "Finding RSEs and Data scientists"
+output: html_notebook
+---
+
+
+This notebook looks at the words that RSEs use to describe themselves, and compares this to the words used in job adverts to recruit RSEs.
+
+We use Twitter biography data to see how RSEs describe themselves, and an archive of job adverts from the RSE association web site to look at words used in recruiting.
+
+
+```{r setup}
+
+library(rtweet)
+library(tidyverse)
+library(wordcloud)
+require(xml2)
+require(tm)
+require(magrittr)
+require(SnowballC)
+
+account <- "ResearchSoftEng"
+maxFriends <- 250
+set.seed(20)
+```
+
+
+## RSE job adverts
+
+We used an arcive of job adverts downloaded from the RSE job site, remove stop words and plot a word cloud:
+
+```{r}
+
+xml<- read_xml("researchsoftwareengineersassociation.wordpress.2018-03-19.xml")
+
+words<- xml %>% xml_text(trim=TRUE)
+
+words<- strsplit(words, " ") 
+
+words<- words %>% tolower() %>% removeWords( c(words=stopwords(kind="en"),"will")) %>%
+  removeNumbers() %>% removePunctuation() %>% strsplit(" ") %>% unlist() %>%
+  stemDocument()
+
+words<- words[nchar(words)<12 & nchar(words)>1]
+
+wordcloud(words, min.freq = 100, max.words = 1000, colors=c("red","blue","green"))
+
+
+```
+
+## Twitter analysis
+
+To see how RSEs describe themselves, we use look at followers of the `r account` Twitter account as a seed; this is the official Twitter account of the RSE association.  We assume that everyone following this is an RSE.
+
+```{r}
+
+rse_follows <- get_followers(account)
+rse_follows_data <- lookup_users(rse_follows$user_id)
+```
+
+
+We then take the description field, and tidy this up.  Some descriptions contain non ASCII characters; we strip these out.
+
+This gives the following word cloud:
+
+```{r}
+
+bios<-rse_follows_data$description
+
+bios<- bios %>% unlist()
+bios<- strsplit(bios, " ")
+
+bios.words<-unlist(bios)
+
+bios.words<-iconv(bios.words, from="UTF-8", to="ASCII")
+
+bios.words<- bios.words %>% tolower() %>% removeWords( c(words=stopwords(kind="en"),"will")) %>%
+  removeNumbers() %>% removePunctuation() %>% strsplit(" ") %>% unlist() %>%
+  stemDocument()
+
+wordcloud(bios.words, min.freq = 20, max.words = 100, colors=c("red","blue","green"),
+          main="Twitter data sci/RSE")
+
+```
+
+We can look at the relative frequencies with which words appear in the two corpuses:
+
+
+
+```{r}
+
+
+combinedWords <- rbind(data.frame(source="jobs", word=words),
+                       data.frame(source="twitter", word=bios.words))
+
+# Frequency of each word in each corpus
+combinedWords %<>% group_by(source, word) %>% 
+  summarise(freq=n()) %>%  ungroup() 
+
+# Total number of words in each corpus
+totals <- combinedWords %>% group_by(source) %>% summarise(total=n())
+
+
+# Calculate relative frequency of each word in each corpus
+combinedWords %<>%  full_join(totals, by="source") %>% 
+  mutate(relfreq = as.numeric(freq)/as.numeric(total))
+
+# Calculat the mean relative frequency of each word - we use this
+# to order the factor for plot order
+combinedrel <- combinedWords %>% group_by(word) %>% 
+  summarise(avgrel = mean(relfreq, na.rm=TRUE)) %>% 
+  arrange(desc(avgrel))
+
+combinedWords$ordered <- factor(as.character(combinedWords$word), 
+                                levels= combinedrel$word)
+
+combinedWords %>% 
+   mutate(relfreq = ifelse(source == "jobs", -relfreq, relfreq)) %>% 
+  filter(word %in% combinedrel$word[1:50]) %>% 
+  filter(word != "NA") %>% 
+  ggplot(aes(x=ordered, y=relfreq, group=source, fill = source)) + geom_col() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(x="word", y="relative frequency") + coord_flip()
+
+
+
+
+```
