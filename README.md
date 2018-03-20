@@ -2,7 +2,7 @@
 
 This project aims to identify Research Software Engineers and Research Data Scientists (some of whom are not formally called like that).
 
-We explore diverse data sources:
+We explore several data sources:
 
 [Research Software Association WordPress Website](http://rse.ac.uk/)
 
