@@ -128,7 +128,7 @@ combinedWords$ordered <- factor(as.character(combinedWords$word),
 
 combinedWords %>% 
    mutate(relfreq = ifelse(source == "jobs", -relfreq, relfreq)) %>% 
-  filter(word %in% combinedrel$word[1:50]) %>% 
+  filter(word %in% combinedrel$word[1:30]) %>% 
   filter(word != "NA") %>% 
   ggplot(aes(x=ordered, y=relfreq, group=source, fill = source)) + geom_col() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
