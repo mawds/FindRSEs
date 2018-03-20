@@ -18,3 +18,4 @@ Plos Articles author contribution attribution.
 ## Analyses
 
 [Relative term frequency in twitter and RSE job adverts](RSEDescriptionAnalysis.nb.html)
+[Find users in github](find-github-users.ipynb)
