@@ -1,0 +1,15 @@
+conda create --name indeed python=2 anaconda
+ 
+pip install goose-extractor
+
+# installing geckodriver
+brew install geckodriver # (gave an error)
+# what worked
+downloading directly from mozilla
+
+https://github.com/mozilla/geckodriver/releases
+
+mv ~/Downloads/geckodriver /usr/local/bin/ 
+
+conda install -c conda-forge wordcloud
+
